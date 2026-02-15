@@ -1,11 +1,53 @@
+Мы обновили квиз по вашему желанию. Теперь перед началом нужно ввести имя, в процессе отображается счётчик правильных/неправильных ответов, в конце выводится подробная статистика и есть кнопка для сохранения скриншота результата. Также добавлены иллюстрации к каждому вопросу (q1.jpg – q15.jpg), а фраза «по благословению» убрана.
+
+### 🆕 Новые возможности
+
+1. **Ввод имени/команды** – перед стартом появляется поле, без заполнения которого квиз не начнётся.
+2. **Прогресс правильных/неправильных** – в верхней части экрана видно, сколько ответов уже верно и сколько неверно.
+3. **Итоговый результат** – после завершения выводится:
+   - Имя участника
+   - Количество правильных и неправильных ответов
+   - Процент верных
+4. **Скриншот результата** – нажмите кнопку «Сохранить скриншот», и итоговый блок сохранится как изображение (используется библиотека html2canvas).
+5. **Иллюстрации к каждому вопросу** – теперь рядом с каждым вопросом отображается картинка `q1.jpg`, `q2.jpg` и т.д. Если картинка не найдена, показывается иконка-заглушка (крест).
+6. **Убран футер** – надпись «по благословению» удалена.
+
+### 🖼️ Требования к иллюстрациям
+
+- Файлы должны называться точно `q1.jpg`, `q2.jpg`, …, `q15.jpg`.
+- Положите их в ту же папку, что и `index.html`.
+- Размер картинок может быть любым, в коде они масштабируются до ширины 100% с максимальной шириной 300px.
+
+### 📸 Как работает скриншот
+
+При нажатии кнопки «Сохранить скриншот» библиотека html2canvas делает снимок блока с результатом (имя, счёт, процент, подбадривание) и автоматически скачивает его в формате PNG. Для работы требуется интернет-соединение (чтобы загрузить html2canvas с CDN).
+
+### 🔧 Технические детали
+
+- Код полностью самодостаточен: все стили и скрипты внутри.
+- Имя сохраняется в `localStorage` на время сессии, чтобы не потерять при перезагрузке.
+- Если не ввести имя, кнопка «Начать квиз» не активна.
+- Прогресс правильных/неправильных обновляется после каждого ответа.
+
+### 📝 Инструкция по запуску
+
+1. Сохраните приведённый ниже код как `index.html` (или оставьте ваше имя `SergiyRadonegskiy_kviz.html` – разницы нет).
+2. Положите в ту же папку 15 картинок с именами `q1.jpg` … `q15.jpg`.
+3. Загрузите всё на GitHub Pages, как описано ранее.
+4. Откройте сайт – квиз готов к использованию.
+
+Если возникнут вопросы или нужны правки – обращайтесь!
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Квиз о Сергии Радонежском</title>
+    <!-- Подключаем html2canvas для скриншотов -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        /* Все стили полностью сохранены из предыдущей версии */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -26,7 +68,7 @@
 
         .quiz-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background: #f7f0d9;
             background-image: 
                 linear-gradient(145deg, rgba(200, 170, 120, 0.2) 0%, transparent 30%),
@@ -93,6 +135,82 @@
             border: 1px solid #b6935c;
         }
 
+        /* Экран ввода имени */
+        .name-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        .name-screen h2 {
+            font-size: 2rem;
+            color: #3f2b16;
+            margin-bottom: 20px;
+        }
+        .name-screen input {
+            font-size: 1.5rem;
+            padding: 15px 25px;
+            width: 80%;
+            max-width: 400px;
+            border: 3px solid #b48b5a;
+            background: #fef7e9;
+            border-radius: 60px;
+            font-family: 'Cormorant Garamond', serif;
+            margin-bottom: 30px;
+            outline: none;
+        }
+        .name-screen input:focus {
+            border-color: #e3a35c;
+            box-shadow: 0 0 0 3px #eec68a;
+        }
+        .btn-start {
+            background: linear-gradient(145deg, #a87e4a, #6f4f2b);
+            border: 2px solid #eac784;
+            color: #fff4dc;
+            font-size: 2rem;
+            font-weight: bold;
+            padding: 18px 50px;
+            border-radius: 100px;
+            cursor: pointer;
+            box-shadow: 0 9px 0 #3f2f1b, 0 6px 12px black;
+            font-family: 'Cormorant Unicase', serif;
+            transition: 0.1s;
+        }
+        .btn-start:hover {
+            background: linear-gradient(145deg, #b48f5a, #8a623a);
+            transform: translateY(-2px);
+            box-shadow: 0 11px 0 #3f2f1b, 0 8px 16px black;
+        }
+        .btn-start:active {
+            transform: translateY(5px);
+            box-shadow: 0 4px 0 #3f2f1b, 0 6px 12px black;
+        }
+        .btn-start:disabled {
+            opacity: 0.6;
+            transform: translateY(0);
+            box-shadow: 0 6px 0 #3f2f1b, 0 4px 8px black;
+            cursor: not-allowed;
+        }
+
+        /* Прогресс и статистика */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            background: #e9d9b4;
+            padding: 12px 25px;
+            border-radius: 60px;
+            border: 2px solid #b07d48;
+            color: #2f1f10;
+            font-weight: 600;
+        }
+        .stats span {
+            background: #b58d56;
+            padding: 5px 15px;
+            border-radius: 40px;
+            color: #251e10;
+        }
+
         .progress {
             display: flex;
             justify-content: space-between;
@@ -150,7 +268,7 @@
             font-size: 1.8rem;
             font-weight: 600;
             color: #2a1c0c;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             line-height: 1.3;
             padding-left: 15px;
             border-left: 6px solid #b68232;
@@ -263,7 +381,7 @@
         }
 
         .result-box p {
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .blessing {
@@ -279,28 +397,21 @@
             line-height: 1.5;
         }
 
-        .blessing small {
-            display: block;
-            margin-top: 15px;
-            font-size: 1.3rem;
-            color: #5e401f;
-        }
-
-        .restart-btn {
+        .restart-btn, .screenshot-btn {
             background: #b58d56;
             border: 3px solid #eacc94;
             color: #231707;
             font-size: 1.6rem;
-            padding: 15px 40px;
+            padding: 15px 30px;
             border-radius: 60px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 25px;
+            margin: 10px;
             transition: 0.2s;
             box-shadow: 0 5px 0 #604d2e;
         }
 
-        .restart-btn:hover {
+        .restart-btn:hover, .screenshot-btn:hover {
             background: #cfaa73;
         }
 
@@ -310,13 +421,27 @@
             text-shadow: 2px 2px 0 #ffd58c;
         }
 
-        footer {
-            margin-top: 30px;
-            font-size: 1.2rem;
-            color: #6b4c29;
-            text-align: center;
-            border-top: 1px dashed #a57a45;
-            padding-top: 20px;
+        .question-image {
+            max-width: 100%;
+            max-height: 200px;
+            border: 3px solid #aa7c4a;
+            border-radius: 20px;
+            margin: 15px auto;
+            display: block;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #d9c8a8;
+            border: 2px dashed #a67942;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #7a572f;
+            margin: 15px auto;
         }
 
         @media (max-width: 600px) {
@@ -330,128 +455,128 @@
 </head>
 <body>
     <div class="quiz-container" id="quizContainer">
-        <h1>КЪНИЗЪ О ПРПДБНѢМЬ СЕРГИИ</h1>
-        <div class="subtitle">Радонежское чудо • Тульская память</div>
-        
-        <!-- Место для иконы (иллюстрация 1) -->
-        <!-- <img src="sergius-icon.jpg" alt="Икона преподобного Сергия" style="width: 150px; display: block; margin: 0 auto 20px; border: 4px solid #b48b5a; border-radius: 10px;"> -->
-
-        <div id="quizContent"></div>
+        <div id="content"></div>
     </div>
 
     <script>
         (function() {
+            // Вопросы
             const questions = [
-                {
-                    question: "Какое имя получил преподобный Сергий при крещении?",
-                    options: ["Варфоломей", "Сергий", "Иоанн", "Петр"],
-                    correct: 0
-                },
-                {
-                    question: "Как звали родителей Сергия Радонежского?",
-                    options: ["Кирилл и Мария", "Иоаким и Анна", "Захария и Елисавета", "Пётр и Феврония"],
-                    correct: 0
-                },
-                {
-                    question: "Какое чудо произошло с будущим святым, когда он был ещё в утробе матери?",
-                    options: ["Трижды прокричал во время литургии", "Явился во сне матери", "Исцелил больного", "Благословил народ из чрева"],
-                    correct: 0
-                },
-                {
-                    question: "Почему маленькому Варфоломею было трудно учиться грамоте?",
-                    options: ["Не мог освоить чтение", "Был ленив", "Не было учителей", "Родители не учили"],
-                    correct: 0
-                },
-                {
-                    question: "Что старец дал отроку Варфоломею после молитвы?",
-                    options: ["Часть просфоры", "Кусочек хлеба", "Святую книгу", "Крест"],
-                    correct: 0
-                },
-                {
-                    question: "Как назывался холм, где Сергий вместе с братом построил первую церковь?",
-                    options: ["Маковец", "Сион", "Голгофа", "Елеон"],
-                    correct: 0
-                },
-                {
-                    question: "Какой зверь приходил к преподобному Сергию и делил с ним хлеб?",
-                    options: ["Медведь", "Волк", "Лиса", "Заяц"],
-                    correct: 0
-                },
-                {
-                    question: "Как называется знаменитый монастырь, основанный Сергием Радонежским?",
-                    options: ["Троице-Сергиева лавра", "Киево-Печерская лавра", "Соловецкий монастырь", "Оптина пустынь"],
-                    correct: 0
-                },
-                {
-                    question: "Что запрещалось монахам по уставу, введённому Сергием?",
-                    options: ["Собирать подаяние", "Есть мясо", "Спать более 4 часов", "Разговаривать после вечерни"],
-                    correct: 0
-                },
-                {
-                    question: "От какой высокой церковной должности Сергий отказался, сказав: «выше моея меры»?",
-                    options: ["От сана митрополита", "От патриаршества", "От игуменства", "От епископства"],
-                    correct: 0
-                },
-                {
-                    question: "На какую битву преподобный Сергий благословил князя Дмитрия Донского?",
-                    options: ["Куликовская битва", "Ледовое побоище", "Невская битва", "Бородинская битва"],
-                    correct: 0
-                },
-                {
-                    question: "Как звали двух монахов-богатырей, которых Сергий отправил с войском?",
-                    options: ["Пересвет и Ослябя", "Илья Муромец и Добрыня", "Борис и Глеб", "Пётр и Феврония"],
-                    correct: 0
-                },
-                {
-                    question: "Почему отправка монахов на войну была необычным поступком для того времени?",
-                    options: ["Церковные правила запрещали монахам воевать", "Монахи были стары", "Монахи не умели воевать", "Они отказались идти"],
-                    correct: 0
-                },
-                {
-                    question: "В каком году был освящён храм преподобного Сергия Радонежского в Туле?",
-                    options: ["1898", "1888", "1900", "1917"],
-                    correct: 0
-                },
-                {
-                    question: "Какая святыня хранится в тульском Сергиевском храме?",
-                    options: ["Образ прп. Сергия с частицей мощей", "Мощи святого", "Икона Божией Матери", "Частица Животворящего Креста"],
-                    correct: 0
-                }
+                { q: "Какое имя получил преподобный Сергий при крещении?", opts: ["Варфоломей", "Сергий", "Иоанн", "Петр"], correct: 0 },
+                { q: "Как звали родителей Сергия Радонежского?", opts: ["Кирилл и Мария", "Иоаким и Анна", "Захария и Елисавета", "Пётр и Феврония"], correct: 0 },
+                { q: "Какое чудо произошло с будущим святым, когда он был ещё в утробе матери?", opts: ["Трижды прокричал во время литургии", "Явился во сне матери", "Исцелил больного", "Благословил народ из чрева"], correct: 0 },
+                { q: "Почему маленькому Варфоломею было трудно учиться грамоте?", opts: ["Не мог освоить чтение", "Был ленив", "Не было учителей", "Родители не учили"], correct: 0 },
+                { q: "Что старец дал отроку Варфоломею после молитвы?", opts: ["Часть просфоры", "Кусочек хлеба", "Святую книгу", "Крест"], correct: 0 },
+                { q: "Как назывался холм, где Сергий вместе с братом построил первую церковь?", opts: ["Маковец", "Сион", "Голгофа", "Елеон"], correct: 0 },
+                { q: "Какой зверь приходил к преподобному Сергию и делил с ним хлеб?", opts: ["Медведь", "Волк", "Лиса", "Заяц"], correct: 0 },
+                { q: "Как называется знаменитый монастырь, основанный Сергием Радонежским?", opts: ["Троице-Сергиева лавра", "Киево-Печерская лавра", "Соловецкий монастырь", "Оптина пустынь"], correct: 0 },
+                { q: "Что запрещалось монахам по уставу, введённому Сергием?", opts: ["Собирать подаяние", "Есть мясо", "Спать более 4 часов", "Разговаривать после вечерни"], correct: 0 },
+                { q: "От какой высокой церковной должности Сергий отказался, сказав: «выше моея меры»?", opts: ["От сана митрополита", "От патриаршества", "От игуменства", "От епископства"], correct: 0 },
+                { q: "На какую битву преподобный Сергий благословил князя Дмитрия Донского?", opts: ["Куликовская битва", "Ледовое побоище", "Невская битва", "Бородинская битва"], correct: 0 },
+                { q: "Как звали двух монахов-богатырей, которых Сергий отправил с войском?", opts: ["Пересвет и Ослябя", "Илья Муромец и Добрыня", "Борис и Глеб", "Пётр и Феврония"], correct: 0 },
+                { q: "Почему отправка монахов на войну была необычным поступком для того времени?", opts: ["Церковные правила запрещали монахам воевать", "Монахи были стары", "Монахи не умели воевать", "Они отказались идти"], correct: 0 },
+                { q: "В каком году был освящён храм преподобного Сергия Радонежского в Туле?", opts: ["1898", "1888", "1900", "1917"], correct: 0 },
+                { q: "Какая святыня хранится в тульском Сергиевском храме?", opts: ["Образ прп. Сергия с частицей мощей", "Мощи святого", "Икона Божией Матери", "Частица Животворящего Креста"], correct: 0 }
             ];
 
-            let currentQuestionIndex = 0;
-            let userAnswers = new Array(questions.length).fill(null);
-            let quizCompleted = false;
+            let state = {
+                playerName: localStorage.getItem('playerName') || '',
+                currentIndex: 0,
+                answers: new Array(questions.length).fill(null),
+                completed: false
+            };
 
-            const quizContent = document.getElementById('quizContent');
+            const contentDiv = document.getElementById('content');
+
+            function saveName(name) {
+                state.playerName = name;
+                localStorage.setItem('playerName', name);
+            }
 
             function render() {
-                if (quizCompleted) {
+                if (!state.playerName) {
+                    renderNameScreen();
+                } else if (state.completed) {
                     renderResult();
                 } else {
                     renderQuestion();
                 }
             }
 
-            function renderQuestion() {
-                const q = questions[currentQuestionIndex];
-                const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
-
+            function renderNameScreen() {
                 let html = `
+                    <div class="name-screen">
+                        <h2>✙ Как имя твоё, человече? ✙</h2>
+                        <input type="text" id="playerNameInput" placeholder="Имя / команда" value="${state.playerName}">
+                        <br>
+                        <button class="btn-start" id="startBtn" disabled>Начать квиз</button>
+                    </div>
+                `;
+                contentDiv.innerHTML = html;
+
+                const input = document.getElementById('playerNameInput');
+                const btn = document.getElementById('startBtn');
+
+                input.addEventListener('input', function() {
+                    if (this.value.trim() !== '') {
+                        btn.disabled = false;
+                    } else {
+                        btn.disabled = true;
+                    }
+                });
+
+                btn.addEventListener('click', function() {
+                    const name = input.value.trim();
+                    if (name) {
+                        saveName(name);
+                        render();
+                    }
+                });
+
+                // Если имя уже было в localStorage, активируем кнопку
+                if (state.playerName) {
+                    input.value = state.playerName;
+                    btn.disabled = false;
+                }
+            }
+
+            function renderQuestion() {
+                const q = questions[state.currentIndex];
+                const progressPercent = (state.currentIndex / questions.length) * 100;
+
+                // Подсчёт правильных/неправильных
+                let correctCount = 0;
+                let wrongCount = 0;
+                state.answers.forEach((ans, idx) => {
+                    if (ans !== null) {
+                        if (ans === questions[idx].correct) correctCount++;
+                        else wrongCount++;
+                    }
+                });
+
+                // Путь к картинке: q1.jpg, q2.jpg...
+                const imgPath = `q${state.currentIndex+1}.jpg`;
+
+                html = `
+                    <div class="stats">
+                        <span>✅ ${correctCount}</span>
+                        <span>❌ ${wrongCount}</span>
+                    </div>
                     <div class="progress">
-                        <span>Вопрос ${currentQuestionIndex+1}/${questions.length}</span>
+                        <span>Вопрос ${state.currentIndex+1}/${questions.length}</span>
                         <div class="progress-bar"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div>
                     </div>
                     <div class="question-box">
-                        <div class="question-text">${q.question}</div>
+                        <div class="question-text">${q.q}</div>
+                        <img src="${imgPath}" alt="Иллюстрация" class="question-image" onerror="this.onerror=null; this.classList.add('image-placeholder'); this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%23d9c8a8\'/><text x=\'50\' y=\'55\' font-size=\'50\' text-anchor=\'middle\' fill=\'%237a572f\' font-family=\'Arial\'>&#10013;</text></svg>';">
                         <div class="answers" id="answersContainer">
                 `;
 
-                q.options.forEach((opt, idx) => {
-                    const checkedAttr = (userAnswers[currentQuestionIndex] === idx) ? 'checked' : '';
+                q.opts.forEach((opt, idx) => {
+                    const checked = (state.answers[state.currentIndex] === idx) ? 'checked' : '';
                     html += `
-                        <label class="answer-item ${userAnswers[currentQuestionIndex] === idx ? 'selected' : ''}">
-                            <input type="radio" name="question" value="${idx}" ${checkedAttr} data-index="${idx}">
+                        <label class="answer-item ${state.answers[state.currentIndex] === idx ? 'selected' : ''}">
+                            <input type="radio" name="question" value="${idx}" ${checked}>
                             ${opt}
                         </label>
                     `;
@@ -460,73 +585,87 @@
                 html += `
                         </div>
                     </div>
-                    <button class="btn-next" id="nextBtn">${currentQuestionIndex === questions.length-1 ? 'Завершить' : 'Далее'}</button>
+                    <button class="btn-next" id="nextBtn">${state.currentIndex === questions.length-1 ? 'Завершить' : 'Далее'}</button>
                 `;
 
-                quizContent.innerHTML = html;
+                contentDiv.innerHTML = html;
 
+                // Обработчики радио
                 document.querySelectorAll('input[name="question"]').forEach(radio => {
                     radio.addEventListener('change', function(e) {
-                        const selectedIdx = parseInt(e.target.value);
-                        userAnswers[currentQuestionIndex] = selectedIdx;
+                        const val = parseInt(e.target.value);
+                        state.answers[state.currentIndex] = val;
                         document.querySelectorAll('.answer-item').forEach(item => item.classList.remove('selected'));
                         e.target.closest('.answer-item').classList.add('selected');
                     });
                 });
 
+                // Кнопка далее/завершить
                 document.getElementById('nextBtn').addEventListener('click', () => {
-                    if (userAnswers[currentQuestionIndex] === null) {
-                        alert('Пожалуйста, выберите ответ.');
+                    if (state.answers[state.currentIndex] === null) {
+                        alert('Выбери ответ, человече!');
                         return;
                     }
-                    if (currentQuestionIndex === questions.length - 1) {
-                        quizCompleted = true;
+
+                    if (state.currentIndex === questions.length - 1) {
+                        state.completed = true;
                         render();
                     } else {
-                        currentQuestionIndex++;
+                        state.currentIndex++;
                         render();
                     }
                 });
             }
 
             function renderResult() {
-                const correctCount = userAnswers.reduce((acc, ans, idx) => {
-                    return acc + (ans === questions[idx].correct ? 1 : 0);
-                }, 0);
+                let correct = 0, wrong = 0;
+                state.answers.forEach((ans, idx) => {
+                    if (ans === questions[idx].correct) correct++;
+                    else wrong++;
+                });
 
-                // Реальные слова преподобного Сергия + подбадривание
-                const blessingMessage = correctCount === questions.length 
+                const percent = Math.round((correct / questions.length) * 100);
+                const blessing = correct === questions.length
                     ? "Истинный знаток жития! Сам преподобный Сергий радуется о твоих познаниях."
                     : "«Внимайте себе, братие. Прежде имейте страх Божий, чистоту душевную и любовь нелицемерную… А ни о чем бесполезном не нужно заботиться, но следует уповать и взирать на Бога». Сие завещал нам преподобный Сергий. А тот, кто учится прилежно, обретает разум и радость. У тебя всё получится!";
 
                 let html = `
-                    <div class="result-box">
-                        <div class="score">${correctCount} / ${questions.length}</div>
-                        <p>правильных ответов</p>
-                        <div class="blessing">
-                            ☦ ${blessingMessage}
-                        </div>
-                        <!-- Место для картинки с Лаврой (иллюстрация 4) -->
-                        <!-- <img src="trinity-lavra-view.jpg" alt="Вид Троице-Сергиевой лавры" style="width: 100%; max-width: 500px; margin: 20px auto; border: 3px solid #aa7c4a; border-radius: 20px;"> -->
-                        <button class="restart-btn" id="restartBtn">Начать заново</button>
+                    <div class="result-box" id="resultBlock">
+                        <div class="score">${correct} / ${questions.length}</div>
+                        <p>правильных: ${correct}  •  неправильных: ${wrong}</p>
+                        <p>${percent}% верных ответов</p>
+                        <p><strong>${state.playerName}</strong></p>
+                        <div class="blessing">☦ ${blessing}</div>
+                        <button class="screenshot-btn" id="screenshotBtn">📸 Сохранить скриншот</button>
+                        <button class="restart-btn" id="restartBtn">Заново</button>
                     </div>
                 `;
 
-                quizContent.innerHTML = html;
+                contentDiv.innerHTML = html;
 
                 document.getElementById('restartBtn').addEventListener('click', () => {
-                    currentQuestionIndex = 0;
-                    userAnswers = new Array(questions.length).fill(null);
-                    quizCompleted = false;
+                    state.currentIndex = 0;
+                    state.answers = new Array(questions.length).fill(null);
+                    state.completed = false;
                     render();
+                });
+
+                document.getElementById('screenshotBtn').addEventListener('click', function() {
+                    const element = document.getElementById('resultBlock');
+                    html2canvas(element, { scale: 2, backgroundColor: '#f5e7cd' }).then(canvas => {
+                        const link = document.createElement('a');
+                        link.download = `Sergiy_quiz_${state.playerName}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    }).catch(err => {
+                        alert('Не удалось сделать скриншот, но ты всегда можешь сохранить вручную.');
+                    });
                 });
             }
 
             render();
         })();
     </script>
-    <footer>
-        <p>✙ По благословению тульского Сергиевского храма ✙</p>
-    </footer>
 </body>
 </html>
+```
