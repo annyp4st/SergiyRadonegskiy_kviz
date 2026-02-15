@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квиз о Сергии Радонежском</title>
+    <style>
+        /* Все стили полностью сохранены из предыдущей версии */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #2b1b0e;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+            padding: 20px;
+            margin: 0;
+            background-image: radial-gradient(circle at 10% 30%, #3d2a1a 0%, #1f140c 100%);
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            background: #f7f0d9;
+            background-image: 
+                linear-gradient(145deg, rgba(200, 170, 120, 0.2) 0%, transparent 30%),
+                repeating-linear-gradient(45deg, rgba(120, 70, 30, 0.03) 0px, rgba(120, 70, 30, 0.03) 2px, transparent 2px, transparent 6px);
+            border: 12px solid #b48b5a;
+            border-image: repeating-linear-gradient(45deg, #b48b5a, #e3c184, #b48b5a) 30 stretch;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5), inset 0 0 30px rgba(255,215,140,0.3);
+            padding: 30px 25px;
+            position: relative;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .quiz-container::before {
+            content: "";
+            position: absolute;
+            top: -18px;
+            left: 20px;
+            right: 20px;
+            height: 30px;
+            background: linear-gradient(135deg, #e9d5a0, #cbaa7a);
+            border-radius: 30px 30px 0 0;
+            box-shadow: inset 0 5px 8px #8b6b42;
+            border-bottom: 2px solid #a57c4a;
+        }
+
+        .quiz-container::after {
+            content: "☦";
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            color: #e9c686;
+            text-shadow: 2px 4px 4px #3f2e1b;
+            opacity: 0.8;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #3f2b16;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0px #e3c184, 4px 4px 0px rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+            font-family: 'Cormorant Unicase', 'Cormorant Garamond', serif;
+            border-bottom: 3px double #ab7e4a;
+            padding-bottom: 20px;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-style: italic;
+            color: #5a3e24;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            background: rgba(222, 184, 135, 0.3);
+            padding: 8px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-left: auto;
+            margin-right: auto;
+            width: fit-content;
+            border: 1px solid #b6935c;
+        }
+
+        .progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 1.3rem;
+            background: #e9d9b4;
+            padding: 10px 20px;
+            border-radius: 60px;
+            border: 2px solid #b07d48;
+            color: #2f1f10;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #dbb27b;
+            border-radius: 10px;
+            flex-grow: 1;
+            margin: 0 15px;
+            border: 1px solid #8a6136;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #b8863d, #efcd91);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            background: rgba(255, 250, 230, 0.7);
+            border: 3px solid #bc8f4b;
+            padding: 25px 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 0 20px #e5cfaa, 0 8px 12px rgba(70, 40, 10, 0.3);
+            border-radius: 20px 0 20px 0;
+            position: relative;
+        }
+
+        .question-box::before {
+            content: "❦";
+            position: absolute;
+            bottom: -15px;
+            right: 10px;
+            font-size: 30px;
+            color: #a67942;
+            opacity: 0.4;
+            transform: rotate(15deg);
+        }
+
+        .question-text {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2a1c0c;
+            margin-bottom: 25px;
+            line-height: 1.3;
+            padding-left: 15px;
+            border-left: 6px solid #b68232;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .answer-item {
+            background: #f2e5cc;
+            border: 2px solid #aa7c4a;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1.4rem;
+            color: #1e140c;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 2px 4px 6px #5d421e;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .answer-item:hover {
+            background: #e9d7b5;
+            border-color: #e3a35c;
+            transform: scale(1.02);
+            box-shadow: 4px 6px 10px #4d371b;
+        }
+
+        .answer-item.selected {
+            background: #cbb786;
+            border-color: #dAA520;
+            box-shadow: 0 0 0 3px #eebc6e;
+            color: #1e1b13;
+            font-weight: 600;
+        }
+
+        input[type="radio"] {
+            appearance: none;
+            width: 26px;
+            height: 26px;
+            border: 2px solid #7a572f;
+            border-radius: 50%;
+            outline: none;
+            background: #faf0d7;
+            cursor: pointer;
+            transition: 0.1s;
+            position: relative;
+        }
+
+        input[type="radio"]:checked {
+            background: #b27d40;
+            border-color: #eeb13a;
+            box-shadow: 0 0 0 2px #ffd68a;
+        }
+
+        input[type="radio"]:checked::after {
+            content: "✙";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffe49e;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .btn-next {
+            background: linear-gradient(145deg, #a87e4a, #6f4f2b);
+            border: 2px solid #eac784;
+            color: #fff4dc;
+            font-size: 1.8rem;
+            font-weight: bold;
+            padding: 18px 40px;
+            border-radius: 100px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            box-shadow: 0 9px 0 #3f2f1b, 0 6px 12px black;
+            font-family: 'Cormorant Unicase', serif;
+        }
+
+        .btn-next:hover {
+            background: linear-gradient(145deg, #b48f5a, #8a623a);
+            border-color: #ffdfa0;
+            transform: translateY(-2px);
+            box-shadow: 0 11px 0 #3f2f1b, 0 8px 16px black;
+        }
+
+        .btn-next:active {
+            transform: translateY(5px);
+            box-shadow: 0 4px 0 #3f2f1b, 0 6px 12px black;
+        }
+
+        .result-box {
+            text-align: center;
+            background: #f5e7cd;
+            border: 4px double #b4844a;
+            padding: 35px 25px;
+            font-size: 1.8rem;
+            color: #2f1d0d;
+            border-radius: 20px;
+        }
+
+        .result-box p {
+            margin: 20px 0;
+        }
+
+        .blessing {
+            font-size: 1.7rem;
+            background: #efe2c6;
+            padding: 25px;
+            border-left: 12px solid #b68b54;
+            font-style: italic;
+            color: #2c1b0b;
+            margin: 30px 0 20px;
+            border-radius: 0 30px 30px 0;
+            box-shadow: inset 0 0 30px #f7e6c8;
+            line-height: 1.5;
+        }
+
+        .blessing small {
+            display: block;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            color: #5e401f;
+        }
+
+        .restart-btn {
+            background: #b58d56;
+            border: 3px solid #eacc94;
+            color: #231707;
+            font-size: 1.6rem;
+            padding: 15px 40px;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 25px;
+            transition: 0.2s;
+            box-shadow: 0 5px 0 #604d2e;
+        }
+
+        .restart-btn:hover {
+            background: #cfaa73;
+        }
+
+        .score {
+            font-size: 3rem;
+            color: #9e691f;
+            text-shadow: 2px 2px 0 #ffd58c;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 1.2rem;
+            color: #6b4c29;
+            text-align: center;
+            border-top: 1px dashed #a57a45;
+            padding-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .question-text { font-size: 1.4rem; }
+            .answer-item { font-size: 1.1rem; padding: 12px 15px; }
+            .btn-next { font-size: 1.4rem; }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Cormorant+Unicase:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="quiz-container" id="quizContainer">
+        <h1>КЪНИЗЪ О ПРПДБНѢМЬ СЕРГИИ</h1>
+        <div class="subtitle">Радонежское чудо • Тульская память</div>
+        
+        <!-- Место для иконы (иллюстрация 1) -->
+        <!-- <img src="sergius-icon.jpg" alt="Икона преподобного Сергия" style="width: 150px; display: block; margin: 0 auto 20px; border: 4px solid #b48b5a; border-radius: 10px;"> -->
+
+        <div id="quizContent"></div>
+    </div>
+
+    <script>
+        (function() {
+            const questions = [
+                {
+                    question: "Какое имя получил преподобный Сергий при крещении?",
+                    options: ["Варфоломей", "Сергий", "Иоанн", "Петр"],
+                    correct: 0
+                },
+                {
+                    question: "Как звали родителей Сергия Радонежского?",
+                    options: ["Кирилл и Мария", "Иоаким и Анна", "Захария и Елисавета", "Пётр и Феврония"],
+                    correct: 0
+                },
+                {
+                    question: "Какое чудо произошло с будущим святым, когда он был ещё в утробе матери?",
+                    options: ["Трижды прокричал во время литургии", "Явился во сне матери", "Исцелил больного", "Благословил народ из чрева"],
+                    correct: 0
+                },
+                {
+                    question: "Почему маленькому Варфоломею было трудно учиться грамоте?",
+                    options: ["Не мог освоить чтение", "Был ленив", "Не было учителей", "Родители не учили"],
+                    correct: 0
+                },
+                {
+                    question: "Что старец дал отроку Варфоломею после молитвы?",
+                    options: ["Часть просфоры", "Кусочек хлеба", "Святую книгу", "Крест"],
+                    correct: 0
+                },
+                {
+                    question: "Как назывался холм, где Сергий вместе с братом построил первую церковь?",
+                    options: ["Маковец", "Сион", "Голгофа", "Елеон"],
+                    correct: 0
+                },
+                {
+                    question: "Какой зверь приходил к преподобному Сергию и делил с ним хлеб?",
+                    options: ["Медведь", "Волк", "Лиса", "Заяц"],
+                    correct: 0
+                },
+                {
+                    question: "Как называется знаменитый монастырь, основанный Сергием Радонежским?",
+                    options: ["Троице-Сергиева лавра", "Киево-Печерская лавра", "Соловецкий монастырь", "Оптина пустынь"],
+                    correct: 0
+                },
+                {
+                    question: "Что запрещалось монахам по уставу, введённому Сергием?",
+                    options: ["Собирать подаяние", "Есть мясо", "Спать более 4 часов", "Разговаривать после вечерни"],
+                    correct: 0
+                },
+                {
+                    question: "От какой высокой церковной должности Сергий отказался, сказав: «выше моея меры»?",
+                    options: ["От сана митрополита", "От патриаршества", "От игуменства", "От епископства"],
+                    correct: 0
+                },
+                {
+                    question: "На какую битву преподобный Сергий благословил князя Дмитрия Донского?",
+                    options: ["Куликовская битва", "Ледовое побоище", "Невская битва", "Бородинская битва"],
+                    correct: 0
+                },
+                {
+                    question: "Как звали двух монахов-богатырей, которых Сергий отправил с войском?",
+                    options: ["Пересвет и Ослябя", "Илья Муромец и Добрыня", "Борис и Глеб", "Пётр и Феврония"],
+                    correct: 0
+                },
+                {
+                    question: "Почему отправка монахов на войну была необычным поступком для того времени?",
+                    options: ["Церковные правила запрещали монахам воевать", "Монахи были стары", "Монахи не умели воевать", "Они отказались идти"],
+                    correct: 0
+                },
+                {
+                    question: "В каком году был освящён храм преподобного Сергия Радонежского в Туле?",
+                    options: ["1898", "1888", "1900", "1917"],
+                    correct: 0
+                },
+                {
+                    question: "Какая святыня хранится в тульском Сергиевском храме?",
+                    options: ["Образ прп. Сергия с частицей мощей", "Мощи святого", "Икона Божией Матери", "Частица Животворящего Креста"],
+                    correct: 0
+                }
+            ];
+
+            let currentQuestionIndex = 0;
+            let userAnswers = new Array(questions.length).fill(null);
+            let quizCompleted = false;
+
+            const quizContent = document.getElementById('quizContent');
+
+            function render() {
+                if (quizCompleted) {
+                    renderResult();
+                } else {
+                    renderQuestion();
+                }
+            }
+
+            function renderQuestion() {
+                const q = questions[currentQuestionIndex];
+                const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+
+                let html = `
+                    <div class="progress">
+                        <span>Вопрос ${currentQuestionIndex+1}/${questions.length}</span>
+                        <div class="progress-bar"><div class="progress-fill" style="width: ${progressPercent}%;"></div></div>
+                    </div>
+                    <div class="question-box">
+                        <div class="question-text">${q.question}</div>
+                        <div class="answers" id="answersContainer">
+                `;
+
+                q.options.forEach((opt, idx) => {
+                    const checkedAttr = (userAnswers[currentQuestionIndex] === idx) ? 'checked' : '';
+                    html += `
+                        <label class="answer-item ${userAnswers[currentQuestionIndex] === idx ? 'selected' : ''}">
+                            <input type="radio" name="question" value="${idx}" ${checkedAttr} data-index="${idx}">
+                            ${opt}
+                        </label>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                    <button class="btn-next" id="nextBtn">${currentQuestionIndex === questions.length-1 ? 'Завершить' : 'Далее'}</button>
+                `;
+
+                quizContent.innerHTML = html;
+
+                document.querySelectorAll('input[name="question"]').forEach(radio => {
+                    radio.addEventListener('change', function(e) {
+                        const selectedIdx = parseInt(e.target.value);
+                        userAnswers[currentQuestionIndex] = selectedIdx;
+                        document.querySelectorAll('.answer-item').forEach(item => item.classList.remove('selected'));
+                        e.target.closest('.answer-item').classList.add('selected');
+                    });
+                });
+
+                document.getElementById('nextBtn').addEventListener('click', () => {
+                    if (userAnswers[currentQuestionIndex] === null) {
+                        alert('Пожалуйста, выберите ответ.');
+                        return;
+                    }
+                    if (currentQuestionIndex === questions.length - 1) {
+                        quizCompleted = true;
+                        render();
+                    } else {
+                        currentQuestionIndex++;
+                        render();
+                    }
+                });
+            }
+
+            function renderResult() {
+                const correctCount = userAnswers.reduce((acc, ans, idx) => {
+                    return acc + (ans === questions[idx].correct ? 1 : 0);
+                }, 0);
+
+                // Реальные слова преподобного Сергия + подбадривание
+                const blessingMessage = correctCount === questions.length 
+                    ? "Истинный знаток жития! Сам преподобный Сергий радуется о твоих познаниях."
+                    : "«Внимайте себе, братие. Прежде имейте страх Божий, чистоту душевную и любовь нелицемерную… А ни о чем бесполезном не нужно заботиться, но следует уповать и взирать на Бога». Сие завещал нам преподобный Сергий. А тот, кто учится прилежно, обретает разум и радость. У тебя всё получится!";
+
+                let html = `
+                    <div class="result-box">
+                        <div class="score">${correctCount} / ${questions.length}</div>
+                        <p>правильных ответов</p>
+                        <div class="blessing">
+                            ☦ ${blessingMessage}
+                        </div>
+                        <!-- Место для картинки с Лаврой (иллюстрация 4) -->
+                        <!-- <img src="trinity-lavra-view.jpg" alt="Вид Троице-Сергиевой лавры" style="width: 100%; max-width: 500px; margin: 20px auto; border: 3px solid #aa7c4a; border-radius: 20px;"> -->
+                        <button class="restart-btn" id="restartBtn">Начать заново</button>
+                    </div>
+                `;
+
+                quizContent.innerHTML = html;
+
+                document.getElementById('restartBtn').addEventListener('click', () => {
+                    currentQuestionIndex = 0;
+                    userAnswers = new Array(questions.length).fill(null);
+                    quizCompleted = false;
+                    render();
+                });
+            }
+
+            render();
+        })();
+    </script>
+    <footer>
+        <p>✙ По благословению тульского Сергиевского храма ✙</p>
+    </footer>
+</body>
+</html>
