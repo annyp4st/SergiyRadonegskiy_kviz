@@ -603,10 +603,11 @@
                 contentDiv.innerHTML = html;
 
                 document.getElementById('restartBtn').addEventListener('click', () => {
-                    state.currentIndex = 0;
-                    state.answers = new Array(questions.length).fill(null);
-                    state.completed = false;
-                    render();
+    localStorage.removeItem('playerName');  // очищаем сохранённое имя
+    state.currentIndex = 0;
+    state.answers = new Array(questions.length).fill(null);
+    state.completed = false;
+    render();
                 });
 
                 document.getElementById('screenshotBtn').addEventListener('click', function() {
